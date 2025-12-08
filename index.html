@@ -10,26 +10,27 @@
         data-size="large"
         data-auth-url="https://kamillllllllllllllllllll.github.io/geometry-dash/">
 </script>
-    <style>
+  <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             overflow: hidden;
-            touch-action: manipulation;
-            user-select: none;
             height: 100vh;
+            width: 100vw;
+            position: fixed;
         }
         
         #gameContainer {
+            width: 100%;
+            height: 100%;
             position: relative;
-            width: 100vw;
-            height: 100vh;
         }
         
         #gameCanvas {
@@ -39,27 +40,49 @@
             width: 100%;
             height: 100%;
             display: block;
+            background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
         }
         
+        /* UI панель */
         #ui {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 10;
+            top: 0;
+            left: 0;
+            right: 0;
             display: flex;
-            gap: 20px;
+            justify-content: space-between;
+            padding: 15px;
+            z-index: 10;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
         }
         
-        #ui > div {
-            background: rgba(0, 0, 0, 0.7);
+        #score, #highScore {
+            background: rgba(0, 0, 0, 0.8);
             color: white;
             padding: 10px 20px;
-            border-radius: 10px;
+            border-radius: 25px;
             font-size: 18px;
             font-weight: bold;
             backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
+        #score::before {
+            content: "★";
+            color: #ffd700;
+            font-size: 20px;
+        }
+        
+        #highScore::before {
+            content: "🏆";
+            font-size: 18px;
+        }
+        
+        /* Меню */
         #menu {
             position: absolute;
             top: 0;
@@ -69,99 +92,215 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 100;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 20;
+            padding: 20px;
         }
         
-        #startScreen, #gameOverScreen {
+        #startScreen {
             text-align: center;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            backdrop-filter: blur(15px);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            max-width: 90%;
+            max-width: 500px;
+            width: 90%;
         }
         
-        h1 {
-            font-size: 48px;
+        .game-title {
+            font-size: 3.5em;
+            font-weight: 900;
             margin-bottom: 10px;
             background: linear-gradient(45deg, #ff0080, #ff8c00, #40e0d0);
-            
             -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 0, 128, 0.3);
         }
         
-        .edition {
-            font-size: 24px;
-            color: #ffd700;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        
-        h2 {
-            font-size: 36px;
-            margin-bottom: 20px;
-            color: #ff4757;
-        }
-        
-        button {
+        .edition-badge {
+            display: inline-block;
             background: linear-gradient(45deg, #6c5ce7, #a29bfe);
             color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 18px;
-            border-radius: 50px;
-            cursor: pointer;
-            margin: 10px;
+            padding: 8px 25px;
+            border-radius: 20px;
+            font-size: 1.2em;
             font-weight: bold;
-            transition: transform 0.2s;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
         }
         
-        button:hover {
-            transform: scale(1.05);
+        .play-button {
+            background: linear-gradient(45deg, #00b894, #00cec9);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 1.5em;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: all 0.3s;
+            box-shadow: 0 8px 25px rgba(0, 184, 148, 0.4);
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .play-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 184, 148, 0.6);
+        }
+        
+        .play-button:active {
+            transform: translateY(1px);
         }
         
         .controls {
-            margin-top: 30px;
-            padding: 20px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .controls p {
-            margin: 5px 0;
-            color: #70a1ff;
+            margin: 10px 0;
+            color: #a4b0be;
+            font-size: 1.1em;
         }
         
+        .controls p::before {
+            content: "• ";
+            color: #70a1ff;
+            font-size: 1.2em;
+        }
+        
+        /* Game Over экран */
+        #gameOverScreen {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .game-over-title {
+            font-size: 2.5em;
+            color: #ff4757;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255, 71, 87, 0.5);
+        }
+        
+        #finalScore {
+            font-size: 2em;
+            color: #ffd700;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        .action-button {
+            background: linear-gradient(45deg, #3742fa, #5352ed);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+            display: inline-block;
+            min-width: 180px;
+        }
+        
+        .action-button.restart {
+            background: linear-gradient(45deg, #00b894, #00cec9);
+        }
+        
+        .action-button.share {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+        }
+        
+        /* Telegram панель */
+        #telegramPanel {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            z-index: 15;
+        }
+        
+        .telegram-card {
+            background: rgba(0, 136, 204, 0.9);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 20px rgba(0, 136, 204, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        
+        .user-info {
+            text-align: left;
+        }
+        
+        .user-name {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .bot-link {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        /* Состояния */
         .hidden {
             display: none !important;
         }
         
-        #authSection {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
+        /* Анимации */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
         
-        .telegram-btn {
-            background: #0088cc;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .pulse {
+            animation: pulse 2s infinite;
         }
         
+        /* Мобильная адаптация */
         @media (max-width: 768px) {
-            h1 { font-size: 36px; }
-            .edition { font-size: 20px; }
-            button { padding: 12px 30px; }
+            .game-title { font-size: 2.5em; }
+            .edition-badge { font-size: 1em; padding: 6px 20px; }
+            .play-button { padding: 15px 40px; font-size: 1.3em; }
+            #score, #highScore { font-size: 16px; padding: 8px 15px; }
+            .telegram-card { padding: 12px 20px; }
+            .user-avatar { width: 40px; height: 40px; font-size: 1.2em; }
+        }
+        
+        @media (max-width: 480px) {
+            .game-title { font-size: 2em; }
+            .play-button { padding: 12px 30px; font-size: 1.2em; }
+            .action-button { min-width: 150px; padding: 12px 20px; }
+            .controls p { font-size: 1em; }
         }
     </style>
 </head>
@@ -169,103 +308,230 @@
     <div id="gameContainer">
         <canvas id="gameCanvas"></canvas>
         
+        <!-- UI счётчики -->
         <div id="ui">
-            <div id="score">★ Очки: 0</div>
-            <div id="highScore">🏆 Рекорд: 0</div>
+            <div id="score">Очки: 0</div>
+            <div id="highScore">Рекорд: 0</div>
+        </div>
+        
+        <!-- Telegram панель (показывается после авторизации) -->
+        <div id="telegramPanel" class="hidden">
+            <div class="telegram-card">
+                <div class="user-avatar" id="userAvatar">С</div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">Студент Техникума</div>
+                    <div class="bot-link">@geometrishLLbot</div>
+                </div>
+            </div>
         </div>
     </div>
-
+    
+    <!-- Меню -->
     <div id="menu">
         <div id="startScreen">
-            <h1>Geometry Dash</h1>
-            <div class="edition">ТЕХНИКУМ EDITION</div>
-            <button id="startBtn">🚀 НАЧАТЬ ИГРУ</button>
+            <div class="game-title">Geometry Dash</div>
+            <div class="edition-badge">ТЕХНИКУМ EDITION</div>
+            
+            <button class="play-button pulse" id="startBtn">🚀 НАЧАТЬ ИГРУ</button>
+            
             <div class="controls">
-                <p>• Кликай для прыжка!</p>
-                <p>• Пробел или ↑ для прыжка</p>
+                <p>Кликай для прыжка!</p>
+                <p>Пробел или ↑ для прыжка</p>
+            </div>
+            
+            <!-- Кнопка Telegram авторизации -->
+            <div style="margin-top: 30px;">
+                <button class="action-button" onclick="simulateTelegramAuth()" 
+                        style="background: linear-gradient(45deg, #0088cc, #00aaff);">
+                    🔐 Войти через Telegram
+                </button>
             </div>
         </div>
         
         <div id="gameOverScreen" class="hidden">
-            <h2>💀 Игра окончена!</h2>
-            <p id="finalScore">Очки: 0</p>
-            <button id="restartBtn">🔄 Играть снова</button>
-            <button id="shareBtn">📤 Поделиться</button>
+            <div class="game-over-title">💀 ИГРА ОКОНЧЕНА</div>
+            <div id="finalScore">Очки: 0</div>
+            <button class="action-button restart" id="restartBtn">🔄 Играть снова</button>
+            <button class="action-button share" id="shareBtn">📤 Поделиться</button>
         </div>
     </div>
 
-    <!-- ИСПРАВЛЕННАЯ КНОПКА TELEGRAM -->
-    <div id="authSection">
-        <button class="telegram-btn" onclick="demoTelegramAuth()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.69 1.02-.59.03-1.03-.39-1.6-.77-.89-.59-1.39-.96-2.25-1.54-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.06-.2-.07-.06-.17-.04-.24-.02-.1.02-1.79 1.14-5.06 3.35-.48.33-.92.49-1.31.48-.43-.01-1.27-.25-1.89-.46-.76-.26-1.37-.4-1.32-.84.03-.23.33-.47.92-.71 3.61-1.57 6.02-2.61 7.23-3.12 3.33-1.38 4.02-1.62 4.47-1.63.1 0 .33.02.48.18.12.13.15.3.14.47z"/>
-            </svg>
-            Войти через Telegram
-        </button>
-    </div>
-
-    <script src="game.js"></script>
-    
-    <script type="text/javascript">
-        // Демо-авторизация (без ошибки домена)
-        function demoTelegramAuth() {
-            const demoUser = {
-                id: 123456789,
+    <script>
+        // Основные переменные игры
+        const game = {
+            score: 0,
+            highScore: 0,
+            isPlaying: false,
+            canvas: null,
+            ctx: null,
+            
+            init: function() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.setupCanvas();
+                this.loadHighScore();
+                this.setupEventListeners();
+                
+                console.log('🎮 Игра инициализирована');
+            },
+            
+            setupCanvas: function() {
+                const resize = () => {
+                    this.canvas.width = window.innerWidth;
+                    this.canvas.height = window.innerHeight;
+                };
+                resize();
+                window.addEventListener('resize', resize);
+            },
+            
+            loadHighScore: function() {
+                const saved = localStorage.getItem('gd_highscore');
+                this.highScore = saved ? parseInt(saved) : 0;
+                document.getElementById('highScore').textContent = `Рекорд: ${this.highScore}`;
+            },
+            
+            setupEventListeners: function() {
+                // Управление
+                document.addEventListener('click', () => this.jump());
+                document.addEventListener('keydown', (e) => {
+                    if ((e.code === 'Space' || e.code === 'ArrowUp') && this.isPlaying) {
+                        this.jump();
+                    }
+                });
+                
+                // Кнопки меню
+                document.getElementById('startBtn').addEventListener('click', () => this.start());
+                document.getElementById('restartBtn').addEventListener('click', () => this.restart());
+                document.getElementById('shareBtn').addEventListener('click', () => this.shareScore());
+            },
+            
+            start: function() {
+                this.isPlaying = true;
+                this.score = 0;
+                document.getElementById('menu').classList.add('hidden');
+                document.getElementById('score').textContent = `Очки: ${this.score}`;
+                this.gameLoop();
+                
+                console.log('🚀 Игра началась');
+            },
+            
+            jump: function() {
+                if (!this.isPlaying) return;
+                console.log('Прыжок!');
+                // Здесь будет логика прыжка
+            },
+            
+            gameLoop: function() {
+                if (!this.isPlaying) return;
+                
+                // Очистка экрана
+                this.ctx.fillStyle = '#0f0c29';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Здесь будет игровая логика
+                
+                // Увеличиваем счёт (демо)
+                this.score++;
+                if (this.score % 10 === 0) {
+                    document.getElementById('score').textContent = `Очки: ${this.score}`;
+                }
+                
+                // Обновляем рекорд
+                if (this.score > this.highScore) {
+                    this.highScore = this.score;
+                    document.getElementById('highScore').textContent = `Рекорд: ${this.highScore}`;
+                    localStorage.setItem('gd_highscore', this.highScore);
+                }
+                
+                // Случайное завершение игры для демо
+                if (Math.random() < 0.005) {
+                    this.gameOver();
+                    return;
+                }
+                
+                requestAnimationFrame(() => this.gameLoop());
+            },
+            
+            gameOver: function() {
+                this.isPlaying = false;
+                document.getElementById('finalScore').textContent = `Очки: ${this.score}`;
+                document.getElementById('menu').classList.remove('hidden');
+                document.getElementById('gameOverScreen').classList.remove('hidden');
+                document.getElementById('startScreen').classList.add('hidden');
+                
+                console.log('💀 Игра окончена. Счёт:', this.score);
+            },
+            
+            restart: function() {
+                document.getElementById('gameOverScreen').classList.add('hidden');
+                document.getElementById('startScreen').classList.remove('hidden');
+                this.score = 0;
+                document.getElementById('score').textContent = `Очки: ${this.score}`;
+            },
+            
+            shareScore: function() {
+                const text = `🎮 Набрал ${this.score} очков в Geometry Dash - ТЕХНИКУМ EDITION!`;
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Geometry Dash',
+                        text: text,
+                        url: window.location.href
+                    });
+                } else {
+                    alert(text + '\n\nСкопируйте и поделитесь с друзьями!');
+                }
+            }
+        };
+        
+        // Telegram авторизация (демо)
+        function simulateTelegramAuth() {
+            const user = {
                 first_name: "Студент",
                 last_name: "Техникума",
-                username: "tech_student",
-                photo_url: null,
-                auth_date: Math.floor(Date.now() / 1000),
-                hash: "demo_hash_123"
+                username: "geometrish_student",
+                id: Math.floor(Math.random() * 1000000)
             };
             
             // Сохраняем данные
-            localStorage.setItem('tg_user', JSON.stringify(demoUser));
+            localStorage.setItem('tg_user', JSON.stringify(user));
             
-            // Скрываем кнопку
-            document.getElementById('authSection').style.display = 'none';
+            // Обновляем UI
+            document.getElementById('userName').textContent = `${user.first_name} ${user.last_name}`;
+            document.getElementById('userAvatar').textContent = user.first_name[0];
+            document.getElementById('telegramPanel').classList.remove('hidden');
             
-            // Показываем уведомление
-            alert(`✅ Добро пожаловать, ${demoUser.first_name} ${demoUser.last_name}!\nТехникум Edition активирован!`);
+            // Показываем сообщение
+            alert(`✅ Авторизация успешна!\nДобро пожаловать, ${user.first_name} ${user.last_name}!`);
             
-            console.log('Демо-авторизация успешна:', demoUser);
+            console.log('🔐 Пользователь авторизован:', user);
         }
         
-        // Проверяем существующую авторизацию
-        window.addEventListener('load', function() {
-            const savedUser = localStorage.getItem('tg_user');
-            if (savedUser) {
+        // Проверка существующей авторизации
+        function checkExistingAuth() {
+            const saved = localStorage.getItem('tg_user');
+            if (saved) {
                 try {
-                    const user = JSON.parse(savedUser);
-                    document.getElementById('authSection').innerHTML = `
-                        <div style="background: rgba(0, 136, 204, 0.9); color: white; 
-                                    padding: 10px 15px; border-radius: 10px; font-size: 14px;">
-                            👋 ${user.first_name} ${user.last_name || ''}
-                        </div>
-                    `;
+                    const user = JSON.parse(saved);
+                    document.getElementById('userName').textContent = 
+                        `${user.first_name || 'Студент'} ${user.last_name || 'Техникума'}`;
+                    document.getElementById('userAvatar').textContent = 
+                        (user.first_name || 'С')[0];
+                    document.getElementById('telegramPanel').classList.remove('hidden');
                 } catch (e) {
                     console.log('Ошибка загрузки пользователя:', e);
                 }
             }
+        }
+        
+        // Инициализация при загрузке
+        window.addEventListener('load', () => {
+            game.init();
+            checkExistingAuth();
+            console.log('✅ Страница загружена');
         });
         
-        // Инициализация игры
-        document.getElementById('startBtn').addEventListener('click', function() {
-            document.getElementById('menu').classList.add('hidden');
-            // Запуск игры из game.js
-            if (window.game) {
-                window.game.start();
-            }
-        });
-        
-        document.getElementById('restartBtn').addEventListener('click', function() {
-            document.getElementById('gameOverScreen').classList.add('hidden');
-            document.getElementById('menu').classList.add('hidden');
-            // Рестарт игры из game.js
-            if (window.game) {
-                window.game.restart();
-            }
-        });
+        // Экспортируем game для отладки
+        window.game = game;
     </script>
 </body>
 </html>
