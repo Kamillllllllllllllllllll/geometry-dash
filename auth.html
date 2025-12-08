@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизация - Geometry Dash</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+ <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 100%;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success {
+            font-size: 28px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .success-icon {
+            font-size: 40px;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .user-info {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            overflow: hidden;
+            border: 3px solid white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #ffd700;
+        }
+
+        .user-details {
+            text-align: left;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .user-details div {
+            margin: 8px 0;
+            padding: 5px 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+
+        .info-label {
+            color: #70a1ff;
+            font-weight: bold;
+        }
+
+        button {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.6);
+            background: linear-gradient(45deg, #FF5252, #FF7E47);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .game-link {
+            margin-top: 30px;
+            color: #a4b0be;
+            font-size: 14px;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .auto-close {
+            margin-top: 20px;
+            color: #70a1ff;
+            font-size: 14px;
+        }
+
+        .countdown {
+            font-weight: bold;
+            color: #ffd700;
+            font-size: 18px;
+        }
+
+        /* Мобильная адаптация */
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+                margin: 10px;
+            }
+            
+            .success {
+                font-size: 22px;
+                flex-direction: column;
+            }
+            
+            .user-name {
+                font-size: 20px;
+            }
+            
+            button {
+                padding: 12px 25px;
+                font-size: 16px;
+            }
+        }
+
+        /* Анимация успеха */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #ffd700;
+            top: 0;
+            opacity: 0;
+        }
+
+        @keyframes confettiRain {
+            0% {
+                opacity: 1;
+                top: -100px;
+                transform: rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                top: 100vh;
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="success">
+            <i class="fas fa-check-circle success-icon"></i>
+            <span>✅ Успешная авторизация!</span>
+        </div>
+        
+        <div class="user-avatar" id="userAvatar">
+            <!-- Аватар будет загружен динамически -->
+        </div>
+        
+        <div class="user-info">
+            <div class="user-name" id="userName"></div>
+            <div class="user-details">
+                <div><span class="info-label">ID:</span> <span id="userId"></span></div>
+                <div><span class="info-label">Имя:</span> <span id="userFirstName"></span></div>
+                <div><span class="info-label">Фамилия:</span> <span id="userLastName"></span></div>
+                <div><span class="info-label">Логин:</span> <span id="userUsername"></span></div>
+                <div><span class="info-label">Дата:</span> <span id="authDate"></span></div>
+            </div>
+        </div>
+        
+        <p style="margin: 20px 0; font-size: 16px;">
+            <i class="fas fa-gamepad"></i> Теперь ты можешь вернуться в игру
+        </p>
+        
+        <button onclick="closeAuth()" id="returnBtn">
+            <i class="fas fa-arrow-left"></i> Вернуться в игру
+        </button>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 10px;">Возвращаемся в игру...</p>
+        </div>
+        
+        <div class="auto-close">
+            <p><i class="fas fa-clock"></i> Автоматический возврат через: <span class="countdown" id="countdown">3</span> сек.</p>
+        </div>
+        
+        <div class="game-link">
+            <p><i class="fas fa-link"></i> Geometry Dash - Техникум Edition</p>
+        </div>
+    </div>
+
+    <script>
+        // Парсим параметры URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const userData = {
+            id: urlParams.get('id'),
+            first_name: decodeURIComponent(urlParams.get('first_name') || ''),
+            last_name: decodeURIComponent(urlParams.get('last_name') || ''),
+            username: urlParams.get('username') || 'Не указан',
+            photo_url: urlParams.get('photo_url'),
+            auth_date: urlParams.get('auth_date'),
+            hash: urlParams.get('hash')
+        };
+
+        // Отображаем информацию пользователя
+        function displayUserInfo() {
+            // Имя пользователя
+            let fullName = userData.first_name;
+            if (userData.last_name) {
+                fullName += ' ' + userData.last_name;
+            }
+            document.getElementById('userName').textContent = fullName;
+            
+            // ID пользователя
+            document.getElementById('userId').textContent = userData.id || 'Не указан';
+            
+            // Имя и фамилия
+            document.getElementById('userFirstName').textContent = userData.first_name || 'Не указано';
+            document.getElementById('userLastName').textContent = userData.last_name || 'Не указана';
+            
+            // Логин
+            document.getElementById('userUsername').textContent = '@' + (userData.username || 'нет_логина');
+            
+            // Дата авторизации
+            if (userData.auth_date) {
+                const date = new Date(parseInt(userData.auth_date) * 1000);
+                document.getElementById('authDate').textContent = 
+                    date.toLocaleDateString('ru-RU') + ' ' + date.toLocaleTimeString('ru-RU');
+            }
+            
+            // Аватар
+            const avatarContainer = document.getElementById('userAvatar');
+            if (userData.photo_url) {
+                avatarContainer.innerHTML = `<img src="${userData.photo_url}" alt="Аватар" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=667eea&color=fff'">`;
+            } else {
+                // Генерация аватара по имени
+                const initials = (userData.first_name?.[0] || '') + (userData.last_name?.[0] || '');
+                avatarContainer.innerHTML = `
+                    <div style="width: 100%; height: 100%; background: linear-gradient(45deg, #667eea, #764ba2); 
+                                display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold;">
+                        ${initials}
+                    </div>
+                `;
+            }
+        }
+
+        // Функция для создания конфетти
+        function createConfetti() {
+            const colors = ['#FF6B6B', '#4ECDC4', '#FFD166', '#06D6A0', '#118AB2', '#EF476F'];
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = Math.random() * 10 + 5 + 'px';
+                confetti.style.animation = `confettiRain ${Math.random() * 3 + 2}s linear forwards`;
+                document.body.appendChild(confetti);
+                
+                // Удаляем конфетти после анимации
+                setTimeout(() => confetti.remove(), 5000);
+            }
+        }
+
+        // Функция закрытия окна авторизации
+        function closeAuth() {
+            try {
+                // Показываем загрузку
+                document.getElementById('returnBtn').style.display = 'none';
+                document.getElementById('loading').style.display = 'block';
+                
+                // Сохраняем данные пользователя в localStorage основной игры
+                if (window.opener) {
+                    // Отправляем данные в родительское окно (игру)
+                    window.opener.postMessage({
+                        type: 'TELEGRAM_AUTH_SUCCESS',
+                        userData: userData
+                    }, '*');
+                    
+                    // Сохраняем в localStorage родительского окна
+                    try {
+                        window.opener.localStorage.setItem('tg_user', JSON.stringify(userData));
+                    } catch (e) {
+                        console.log('Не удалось сохранить в localStorage родительского окна:', e);
+                    }
+                    
+                    // Закрываем окно через 1 секунду
+                    setTimeout(() => {
+                        window.close();
+                    }, 1000);
+                    
+                } else if (window.Telegram && Telegram.WebApp) {
+                    // Если открыто в Telegram WebApp
+                    Telegram.WebApp.sendData(JSON.stringify({
+                        action: 'telegram_login',
+                        user: userData
+                    }));
+                    
+                    // Закрываем WebApp
+                    setTimeout(() => {
+                        Telegram.WebApp.close();
+                    }, 1000);
+                    
+                } else {
+                    // Для обычного браузера - возвращаемся назад
+                    setTimeout(() => {
+                        window.history.back();
+                    }, 1000);
+                }
+                
+            } catch (error) {
+                console.log('Ошибка при закрытии:', error);
+                
+                // Fallback: просто возвращаемся назад
+                setTimeout(() => {
+                    window.history.back();
+                }, 1000);
+            }
+        }
+
+        // Таймер автоматического закрытия
+        function startAutoCloseTimer() {
+            let seconds = 3;
+            const countdownElement = document.getElementById('countdown');
+            const timerInterval = setInterval(() => {
+                seconds--;
+                countdownElement.textContent = seconds;
+                
+                if (seconds <= 0) {
+                    clearInterval(timerInterval);
+                    closeAuth();
+                }
+            }, 1000);
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Отображаем информацию пользователя
+            displayUserInfo();
+            
+            // Создаем конфетти для праздничного эффекта
+            createConfetti();
+            
+            // Запускаем таймер автоматического закрытия
+            startAutoCloseTimer();
+            
+            // Сохраняем данные в localStorage текущего окна
+            try {
+                localStorage.setItem('tg_user', JSON.stringify(userData));
+                console.log('Данные пользователя сохранены в localStorage');
+            } catch (e) {
+                console.log('Не удалось сохранить в localStorage:', e);
+            }
+            
+            // Логируем данные для отладки
+            console.log('Данные пользователя:', userData);
+        });
+
+        // Обработка нажатия клавиши Escape
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeAuth();
+            }
+        });
+    </script>
+</body>
+</html>
